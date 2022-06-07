@@ -1,0 +1,4 @@
+name: U9GUtils
+version: '${version}'
+main: com.github.u9g.u9gutils.U9GUtils
+api-version: 1.18
