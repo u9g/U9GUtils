@@ -1,6 +1,5 @@
 package com.github.u9g.u9gutils;
 
-import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -8,7 +7,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.UnsafeValues;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
@@ -17,13 +15,9 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.profile.PlayerTextures;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -97,14 +91,16 @@ public class ItemBuilder {
 
     public ItemBuilder enchant (Enchantment enchantment, int level) {
         setItemMeta(im -> {
+            if (im.hasItemFlag(ItemFlag.HIDE_ENCHANTS))
+                im.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
             im.addEnchant(enchantment, level, true);
         });
         return this;
     }
 
-    public ItemBuilder attribute (Attribute attr, double amount) {
+    public ItemBuilder attribute (Attribute attr, AttributeModifier.Operation mod, double amount) {
         setItemMeta(im -> {
-            im.addAttributeModifier(attr, new AttributeModifier(UUID.randomUUID(), attr.translationKey(), amount, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND));
+            im.addAttributeModifier(attr, new AttributeModifier(UUID.randomUUID(), attr.translationKey(), amount, mod, EquipmentSlot.HAND));
         });
         return this;
     }
@@ -141,7 +137,7 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder set (@NotNull NamespacedKey key, @NotNull long value) {
+    public ItemBuilder set (@NotNull NamespacedKey key, long value) {
         ItemMeta im = item.getItemMeta();
         NBTUtil.set(im, key, value);
         item.setItemMeta(im);
